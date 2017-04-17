@@ -85,10 +85,156 @@ class SnakeAgent(Agent):
 class DodgeAgent(Agent):
     "You can run, but you can't hide."
     
+    def checkHole(self, dir, state):
+        walls = state.getWalls()
+        
+        xlen = walls.width
+        ylen = walls.height
+        "x, y are current position, 1-based"
+        x = state.getPacmanPosition()[0]
+        y = state.getPacmanPosition()[1]
+        if dir==Directions.EAST:
+            print x, y, "checkhole east", walls[x+1+1][y] and walls[x+1][y+1] and walls[x+1][y-1]
+            if x+1+2<xlen:
+                "hole of depth 1 and 2"
+                return walls[x+1+1][y] and walls[x+1][y+1] and walls[x+1][y-1] or \
+                    walls[x+1+2][y] and walls[x+1+1][y+1] and walls[x+1+1][y-1] and walls[x+1][y+1] and walls[x+1][y-1]
+            else:
+                "hole of depth 1"
+                return walls[x+1+1][y] and walls[x+1][y+1] and walls[x+1][y-1]
+        elif dir==Directions.WEST:
+            print x, y, "checkhole west", walls[x-1-1][y] and walls[x-1][y+1] and walls[x-1][y-1]
+            if x-1-2>=0:
+                return walls[x-1-1][y] and walls[x-1][y+1] and walls[x-1][y-1] or \
+                    walls[x-1-2][y] and walls[x-1-1][y+1] and walls[x-1-1][y-1] and walls[x-1][y+1] and walls[x-1][y-1]
+            else:
+                return walls[x-1-1][y] and walls[x-1][y+1] and walls[x-1][y-1]
+        elif dir==Directions.NORTH:
+            print x, y, "checkhole north", walls[x][y+1+1] and walls[x+1][y+1] and walls[x-1][y+1]
+            if y+1+2<ylen:
+                return walls[x][y+1+1] and walls[x+1][y+1] and walls[x-1][y+1] or \
+                    walls[x][y+1+2] and walls[x+1][y+1+1] and walls[x-1][y+1+1] and walls[x+1][y+1] and walls[x-1][y+1]
+            else:
+                return walls[x][y+1+1] and walls[x+1][y+1] and walls[x-1][y+1]
+        elif dir==Directions.SOUTH:
+            print x, y, "checkhole south", walls[x][y-1-1] and walls[x+1][y-1] and walls[x-1][y-1]
+            if y-1-2>=0:
+                return walls[x][y-1-1] and walls[x+1][y-1] and walls[x-1][y-1] or \
+                    walls[x][y-1-2] and walls[x+1][y-1-1] and walls[x-1][y-1-1] and walls[x+1][y-1] and walls[x-1][y-1]
+            else:
+                return walls[x][y-1-1] and walls[x+1][y-1] and walls[x-1][y-1]
+    
     def getAction(self, state):
         "The agent receives a GameState (defined in pacman.py)."
         "[Project 1] YOUR CODE HERE"
-        
+#        print state.getPacmanPosition()
+#        print state.getWalls()
+        print ""
+        print "agent position", state.getPacmanPosition()
+        print "ghost position", state.getGhostPosition(1)
+#        if state.getGhostPosition(1)[0]==state.getPacmanPosition()[0]:
+#            #at same vertical line
+#            print 'same vertical line'
+#            if Directions.WEST in state.getLegalPacmanActions():
+#                print 'go west'
+#                return Directions.WEST
+#            elif Directions.EAST in state.getLegalPacmanActions():
+#                print 'go east'
+#                return Directions.EAST
+#        elif state.getGhostPosition(1)[1]==state.getPacmanPosition()[1]:
+#            #at same horizontal line
+#            print 'same horizontal line'
+#            if Directions.NORTH in state.getLegalPacmanActions():
+#                print 'go north'
+#                return Directions.NORTH
+#            elif Directions.SOUTH in state.getLegalPacmanActions():
+#                print 'go south'
+#                return Directions.SOUTH
+        for dir in state.getLegalPacmanActions():
+            print dir
+            self.checkHole(dir, state)
+            
+        if 0 <= state.getGhostPosition(1)[0] - state.getPacmanPosition()[0] <=2 \
+            and state.getGhostPosition(1)[1] == state.getPacmanPosition()[1]:
+            #ghost from east 
+#            print 'ghost from east'
+            legalActions = state.getLegalPacmanActions()
+            
+            "STOP is default action(it has lowest priority)"
+            legalActions.remove(Directions.STOP)
+            
+            "don't go to the ghost"
+            if Directions.EAST in legalActions:
+                legalActions.remove(Directions.EAST)
+            
+            "don't go in the hole"
+            for dir in legalActions:
+                if self.checkHole(dir, state)==True:
+                    print "before remove", legalActions
+                    print "remove", dir
+                    legalActions.remove(dir)
+                    print "after remove", legalActions
+                    
+            if len(legalActions)!=0:
+                print legalActions[0]
+                return legalActions[0]
+        elif 0 >= state.getGhostPosition(1)[0] - state.getPacmanPosition()[0] >=-2 \
+            and state.getGhostPosition(1)[1] == state.getPacmanPosition()[1]:
+            #ghost from west 
+#            print 'ghost from west'
+            legalActions = state.getLegalPacmanActions()
+            legalActions.remove(Directions.STOP)
+            if Directions.WEST in legalActions:
+                legalActions.remove(Directions.WEST)
+            "don't go in the hole"
+            "don't go in the hole"
+            for dir in legalActions:
+                if self.checkHole(dir, state)==True:
+                    print "before remove", legalActions
+                    print "remove", dir
+                    legalActions.remove(dir)
+                    print "after remove", legalActions
+            if len(legalActions)!=0:
+                print legalActions[0]
+                return legalActions[0]
+        elif 0 <= state.getGhostPosition(1)[1] - state.getPacmanPosition()[1] <=2 \
+            and state.getGhostPosition(1)[0] == state.getPacmanPosition()[0]:
+            #ghost from north
+            print 'ghost from north'
+            legalActions = state.getLegalPacmanActions()
+            legalActions.remove(Directions.STOP)
+            if Directions.NORTH in legalActions:
+                legalActions.remove(Directions.NORTH)
+            "don't go in the hole"
+            "don't go in the hole"
+            for dir in legalActions:
+                if self.checkHole(dir, state)==True:
+                    print "before remove", legalActions
+                    print "remove", dir
+                    legalActions.remove(dir)
+                    print "after remove", legalActions
+            if len(legalActions)!=0:
+                print legalActions[0]
+                return legalActions[0]
+        elif 0 >= state.getGhostPosition(1)[0] - state.getPacmanPosition()[0] >=-2 \
+            and state.getGhostPosition(1)[0] == state.getPacmanPosition()[0]:
+            #ghost from south
+            print 'ghost from south'
+            legalActions = state.getLegalPacmanActions()
+            legalActions.remove(Directions.STOP)
+            if Directions.SOUTH in legalActions:
+                legalActions.remove(Directions.SOUTH)
+            "don't go in the hole"
+            "don't go in the hole"
+            for dir in legalActions:
+                if self.checkHole(dir, state)==True:
+                    print "before remove", legalActions
+                    print "remove", dir
+                    legalActions.remove(dir)
+                    print "after remove", legalActions
+            if len(legalActions)!=0:
+                print legalActions[0]
+                return legalActions[0]
         return Directions.STOP
 
 #######################################################
