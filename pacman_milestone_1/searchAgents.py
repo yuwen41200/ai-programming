@@ -70,17 +70,49 @@ class FroggerAgent(Agent):
         "[Project 1] YOUR CODE HERE"
         
         return Directions.STOP
-        
+
 "P1-3"
 class SnakeAgent(Agent):
     "But you don't have a sneaking suit."
-    
+    status = 0
+
     def getAction(self, state):
         "The agent receives a GameState (defined in pacman.py)."
         "[Project 1] YOUR CODE HERE"
-        
-        return Directions.STOP
-        
+        print "Ghost 1:", state.getGhostPosition(1), state.getGhostState(1).getDirection()
+        print "Ghost 2:", state.getGhostPosition(2), state.getGhostState(2).getDirection()
+        print ""
+
+        if self.status == 0 and state.getPacmanPosition()[0] == 3:
+            self.status = 1
+            return Directions.NORTH
+        elif self.status == 0:
+            return Directions.EAST
+        elif self.status == 1 and \
+            17 > state.getGhostPosition(1)[0] > 3 and state.getGhostState(1).getDirection() == Directions.EAST and \
+            17 > state.getGhostPosition(2)[0] > 3 and state.getGhostState(2).getDirection() == Directions.EAST:
+            self.status = 2
+            return Directions.SOUTH
+        elif self.status == 2 and state.getPacmanPosition()[0] == 12:
+            self.status = 3
+            return Directions.SOUTH
+        elif self.status == 2:
+            return Directions.EAST
+        elif self.status == 3 and \
+            (state.getGhostPosition(1)[0] < 12 and state.getGhostState(1).getDirection() == Directions.WEST or
+            state.getGhostPosition(1)[0] < 3 and state.getGhostState(1).getDirection() == Directions.EAST) and \
+            (state.getGhostPosition(2)[0] < 12 and state.getGhostState(2).getDirection() == Directions.WEST or
+            state.getGhostPosition(2)[0] < 3 and state.getGhostState(2).getDirection() == Directions.EAST):
+            self.status = 4
+            return Directions.NORTH
+        elif self.status == 4 and state.getPacmanPosition()[0] == 20:
+            self.status = 5
+            return Directions.STOP
+        elif self.status == 4:
+            return  Directions.EAST
+        else:
+            return Directions.STOP
+
 "P1-4"
 class DodgeAgent(Agent):
     "You can run, but you can't hide."
