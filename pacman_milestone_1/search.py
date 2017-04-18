@@ -70,7 +70,7 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
 
 # P2-1
 def depthFirstSearch(problem):
@@ -87,10 +87,45 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    
-    "[Project 2] YOUR CODE HERE"
-    
-    util.raiseNotDefined()
+    def printInfo(state, acts):
+        print "Start:", state
+        print "Is the start a goal?", problem.isGoalState(state)
+        print "Start's successors:", problem.getSuccessors(state)
+        print "Actions:", acts
+        print ""
+
+    actions = []
+    stack = util.Stack()
+    currentState = problem.getStartState()
+    visitedStates = set()
+    history = []
+
+    while True:
+        printInfo(currentState, actions)
+        visitedStates.add(currentState)
+        history.insert(0, currentState)
+
+        if problem.isGoalState(currentState):
+            break
+
+        for successor in problem.getSuccessors(currentState):
+            successor = (successor[0], successor[1], currentState)
+            stack.push(successor)
+
+        nextState = stack.pop()
+        while nextState[0] in visitedStates:
+            nextState = stack.pop()
+
+        from game import Directions
+        goBackN = history.index(nextState[2])
+        for i in range(goBackN):
+            history.insert(0, history[i+i+1])
+            actions.append(Directions.REVERSE[actions[-i-i-1]])
+        actions.append(nextState[1])
+
+        currentState = nextState[0]
+
+    return actions
 
 # P2-2
 def breadthFirstSearch(problem):
