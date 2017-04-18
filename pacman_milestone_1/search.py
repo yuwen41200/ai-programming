@@ -101,7 +101,7 @@ def depthFirstSearch(problem):
     history = []
 
     while True:
-        printInfo(currentState, actions)
+        # printInfo(currentState, actions)
         visitedStates.add(currentState)
         history.insert(0, currentState)
 
@@ -116,11 +116,12 @@ def depthFirstSearch(problem):
         while nextState[0] in visitedStates:
             nextState = stack.pop()
 
-        from game import Directions
+        # from game import Directions
         goBackN = history.index(nextState[2])
         for i in range(goBackN):
             history.insert(0, history[i+i+1])
-            actions.append(Directions.REVERSE[actions[-i-i-1]])
+            # actions.append(Directions.REVERSE[actions[-i-i-1]])
+            del actions[-1]
         actions.append(nextState[1])
 
         currentState = nextState[0]
