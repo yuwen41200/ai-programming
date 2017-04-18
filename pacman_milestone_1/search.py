@@ -119,7 +119,8 @@ def depthFirstSearch(problem):
         # from game import Directions
         goBackN = history.index(nextState[2])
         for i in range(goBackN):
-            history.insert(0, history[i+i+1])
+            # history.insert(0, history[i+i+1])
+            del history[0]
             # actions.append(Directions.REVERSE[actions[-i-i-1]])
             del actions[-1]
         actions.append(nextState[1])
