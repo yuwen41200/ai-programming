@@ -132,10 +132,42 @@ def depthFirstSearch(problem):
 # P2-2
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    
-    "[Project 2] YOUR CODE HERE"    
-    
-    util.raiseNotDefined()
+    def printInfo(state, bt):
+        print "Start:", state
+        print "Is the start a goal?", problem.isGoalState(state)
+        print "Start's successors:", problem.getSuccessors(state)
+        print "Backtrace Map:", bt
+        print ""
+
+    actions = []
+    queue = util.Queue()
+    currentState = problem.getStartState()
+    visitedStates = set()
+    backtraceMap = {}
+
+    while True:
+        # printInfo(currentState, backtraceMap)
+        visitedStates.add(currentState)
+
+        if problem.isGoalState(currentState):
+            break
+
+        for successor in problem.getSuccessors(currentState):
+            successor = (successor[0], successor[1], currentState)
+            queue.push(successor)
+
+        nextState = queue.pop()
+        while nextState[0] in visitedStates:
+            nextState = queue.pop()
+
+        backtraceMap[(nextState[0])] = (nextState[1], nextState[2])
+        currentState = nextState[0]
+
+    while currentState != problem.getStartState():
+        actions.insert(0, backtraceMap[currentState][0])
+        currentState = backtraceMap[currentState][1]
+
+    return actions
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
