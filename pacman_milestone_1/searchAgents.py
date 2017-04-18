@@ -235,6 +235,13 @@ class DodgeAgent(Agent):
             if len(legalActions)!=0:
                 print legalActions[0]
                 return legalActions[0]
+        else:
+            if Directions.EAST in state.getLegalPacmanActions():
+                return Directions.EAST
+            elif Directions.SOUTH in state.getLegalPacmanActions():
+                return Directions.SOUTH
+            else:
+                return Directions.STOP
         return Directions.STOP
 
 #######################################################
