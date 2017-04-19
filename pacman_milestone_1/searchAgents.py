@@ -54,22 +54,50 @@ class GoWestAgent(Agent):
 "P1-1"
 class CleanerAgent(Agent):
     "The floor is too dirty."
-    
+
     def getAction(self, state):
         "The agent receives a GameState (defined in pacman.py)."
         "[Project 1] YOUR CODE HERE"
-        
-        return Directions.STOP
-            
+        (x,y) = state.getPacmanPosition()
+        currentfood = state.getFood()
+        if currentfood[x+1][y]:
+            return Directions.EAST
+        elif currentfood[x][y-1]:
+            return Directions.SOUTH
+        elif currentfood[x-1][y]:
+            return Directions.WEST
+        elif currentfood[x][y+1]:
+            return Directions.NORTH
+        else:
+            return Directions.STOP
+
 "P1-2"
 class FroggerAgent(Agent):
     "It's dangerous to cross streets with eyes closed."
-    
+
+    n = Directions.NORTH
+    s = Directions.SOUTH
+    e = Directions.EAST
+    w = Directions.WEST
+    stop = Directions.STOP
+    i = -1
+    path = [e, s, s, s, s, s, s, e, e, e, e, e, e, s]
+
     def getAction(self, state):
         "The agent receives a GameState (defined in pacman.py)."
         "[Project 1] YOUR CODE HERE"
-        
-        return Directions.STOP
+        s1 = (1,5) in state.getGhostPositions() or (2,5) in state.getGhostPositions() or (3,5) in state.getGhostPositions()
+        s2 = (6,1) in state.getGhostPositions() or (6,2) in state.getGhostPositions() or (6,3) in state.getGhostPositions()
+        if self.i == 2 and s1:
+            return Directions.STOP
+        elif self.i == 9 and s2:
+            return Directions.STOP
+        else:
+            if self.path[self.i+1] in state.getLegalPacmanActions():
+                self.i = self.i + 1
+                return self.path[self.i]
+            else:
+                return Directions.STOP
 
 "P1-3"
 class SnakeAgent(Agent):
