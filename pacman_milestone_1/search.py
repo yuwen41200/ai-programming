@@ -70,7 +70,7 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return [s, s, w, s, w, w, s, w]
+    return  [s, s, w, s, w, w, s, w]
 
 # P2-1
 def depthFirstSearch(problem):
@@ -87,6 +87,8 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
+    
+    "[Project 2] YOUR CODE HERE"
     def printInfo(state, acts):
         print "Start:", state
         print "Is the start a goal?", problem.isGoalState(state)
@@ -128,10 +130,13 @@ def depthFirstSearch(problem):
         currentState = nextState[0]
 
     return actions
+    util.raiseNotDefined()
 
 # P2-2
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
+    
+    "[Project 2] YOUR CODE HERE"    
     def printInfo(state, bt):
         print "Start:", state
         print "Is the start a goal?", problem.isGoalState(state)
@@ -168,6 +173,7 @@ def breadthFirstSearch(problem):
         currentState = backtraceMap[currentState][1]
 
     return actions
+    util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -187,8 +193,54 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     
     "[Project 2] YOUR CODE HERE"
     
-    util.raiseNotDefined()
-
+    """
+    the priority queue use f() value as priority, so the successor with 
+    smaller f() value would be pop first
+    """
+    pqueue = util.PriorityQueue()
+    actions = []
+    currentState = problem.getStartState()
+    visitedStates = set()
+    backtraceMap = {}
+    
+    gvalues = {}
+    gvalues[currentState] = 0
+    
+    while True:
+        visitedStates.add(currentState)
+        
+        "Astar search is optimal"
+        if problem.isGoalState(currentState):
+            break
+        
+        for successor in problem.getSuccessors(currentState):
+            "successor[0]:pos, [1]:action, [2]:stepCost"
+#            print "currentState", currentState
+            g = gvalues[currentState] + successor[2]
+            gvalues[successor[0]] = g
+            h = heuristic(successor[0], problem)
+            successor = (successor[0], successor[1], currentState)
+            
+#            "not visited or better path"
+#            if not successor[0] in visitedStates or g < gvalues.get(successor[0], -1):
+#                #dict.get(key, default_value)
+#                pqueue.push(item=successor, priority=g+h) #f value as priority
+            
+            pqueue.push(item=successor, priority=g+h) #f value as priority
+        
+#        print pqueue.count
+        nextState = pqueue.pop()
+        while nextState[0] in visitedStates:
+            nextState = pqueue.pop()
+            
+        backtraceMap[(nextState[0])] = (nextState[1], nextState[2])
+        currentState = nextState[0]
+        
+    while currentState!=problem.getStartState():
+        actions.insert(0, backtraceMap[currentState][0])
+        currentState = backtraceMap[currentState][1]
+    
+    return actions
 
 # Abbreviations
 astar = aStarSearch
