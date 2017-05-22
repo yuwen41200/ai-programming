@@ -15,6 +15,7 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
+import numpy as np
 
 from game import Agent
 
@@ -74,7 +75,27 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "[Project 3] YOUR CODE HERE"
+        print "successorGameState\n", successorGameState
+        print "newPos", newPos
+        print "newFood\n", newFood
+        print "len: ", newFood.width, newFood.height
+        print "newGhostStates", newGhostStates
+        print "newScaredTimes", newScaredTimes
+        print ""
         
+        """newFood: grid[x][y] where (x,y) are positions on a Pacman map with x horizontal,
+        y vertical and the origin (0,0) in the bottom left corner
+        wall will take col 0 and col 24, row 0 and row 8"""
+        def circleFoodScore(newPos, newFood):
+            score = 0
+            left = newPos[0]-1 if newPos[0]-1>=0 else 0
+            right = newPos[0]+1 if newPos[0]+1<newFood.width else newFood.width-1
+            top = newPos[1]-1 if newPos[1]-1>=0 else 0
+            bottom = newPos[1]+1 if newPos[1]+1<newFood.height else newFood.height-1
+            print left, right, top, bottom
+            print newFood[top:bottom+1][left:right+1]
+        
+        circleFoodScore(newPos, newFood)
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
@@ -111,7 +132,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
       Your minimax agent (question 2)
     """
-
+        
     def getAction(self, gameState):
         """
           Returns the minimax action from the current gameState using self.depth
@@ -130,8 +151,39 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         
-        "[Project 3] YOUR CODE HERE"        
-        
+        "[Project 3] YOUR CODE HERE"      
+
+        def minimax(gameState, cdepth, linkDict):
+            agentIndex = cdepth%gameState.getNumAgents()
+            legalActions = gameState.getLegalActions(agentIndex)
+            """The meaning of depth is that you must go until (self.depth+1)'s max layer"""
+            if gameState.isLose() or gameState.isWin() or len(legalActions)==0 or cdepth==self.depth*gameState.getNumAgents():
+                return self.evaluationFunction(gameState)
+            elif agentIndex==0:
+                successors = [gameState.generateSuccessor(agentIndex, action) for action in legalActions]
+                successors_scores = [minimax(successor, cdepth+1, linkDict) for successor in successors]
+                successors_scores = np.asarray(successors_scores)
+                maxid = successors_scores.argmax()
+                linkDict.update({gameState:legalActions[maxid]})
+                return max(successors_scores)
+            else:
+                successors = [gameState.generateSuccessor(agentIndex, action) for action in legalActions]
+                successors_scores = [minimax(successor, cdepth+1, linkDict) for successor in successors]
+                successors_scores = np.asarray(successors_scores)
+                minid = successors_scores.argmin()
+                linkDict.update({gameState:legalActions[minid]})
+                return min(successors_scores)    
+    
+        linkDict = {}
+        minimax(gameState, 0, linkDict)
+        path = []
+        cState = gameState
+        for i in range(self.depth):
+            agentIndex = i%gameState.getNumAgents()
+            if cState in linkDict.keys():
+                if agentIndex==0: path.append(linkDict[cState])
+                cState = cState.generateSuccessor(agentIndex, linkDict[cState])
+        return path[0]
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
