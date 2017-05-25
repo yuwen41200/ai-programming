@@ -11,9 +11,6 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
-from util import manhattanDistance
-from game import Directions
 import random, util
 import numpy as np
 
@@ -28,7 +25,6 @@ class ReflexAgent(Agent):
       it in any way you see fit, so long as you don't touch our method
       headers.
     """
-
 
     def getAction(self, gameState):
         """
@@ -73,20 +69,25 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        distance = util.manhattanDistance(newPos, newGhostStates[0].getPosition())
 
         "[Project 3] YOUR CODE HERE"
+
         print "successorGameState\n", successorGameState
         print "newPos", newPos
         print "newFood\n", newFood
-        print "len: ", newFood.width, newFood.height
-        print "newGhostStates", newGhostStates
+        print "newLen", newFood.width, newFood.height
+        print "newGhostPosition", newGhostStates[0].getPosition()
         print "newScaredTimes", newScaredTimes
+        print "distance", distance
         print ""
-        
-        """newFood: grid[x][y] where (x,y) are positions on a Pacman map with x horizontal,
-        y vertical and the origin (0,0) in the bottom left corner
-        wall will take col 0 and col 24, row 0 and row 8"""
+
         def circleFoodScore(newPos, newFood):
+            """
+            newFood: grid[x][y] where (x,y) are positions on a Pacman map with x horizontal,
+            y vertical and the origin (0,0) in the bottom left corner
+            wall will take col 0 and col 24, row 0 and row 8
+            """
             score = 0
             left = newPos[0]-1 if newPos[0]-1>=0 else 0
             right = newPos[0]+1 if newPos[0]+1<newFood.width else newFood.width-1
@@ -94,9 +95,22 @@ class ReflexAgent(Agent):
             bottom = newPos[1]+1 if newPos[1]+1<newFood.height else newFood.height-1
             print left, right, top, bottom
             print newFood[top:bottom+1][left:right+1]
-        
-        circleFoodScore(newPos, newFood)
-        return successorGameState.getScore()
+
+        if distance < 2:
+            return -2147483647
+        elif distance < 3:
+            return -2147483646
+        elif successorGameState.getScore() - currentGameState.getScore() > 0:
+            return successorGameState.getScore()
+        else:
+            score = 0
+            for i in range(newFood.width):
+                for j in range(newFood.height):
+                    if newFood[i][j]:
+                        score -= abs(newPos[0] - i) + abs(newPos[1] - j)
+                    else:
+                        score -= 256
+            return score
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -132,7 +146,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
       Your minimax agent (question 2)
     """
-        
+
     def getAction(self, gameState):
         """
           Returns the minimax action from the current gameState using self.depth
@@ -150,8 +164,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
-        
-        "[Project 3] YOUR CODE HERE"      
+
+        "[Project 3] YOUR CODE HERE"
 
         def minimax(gameState, cdepth, linkDict):
             agentIndex = cdepth%gameState.getNumAgents()
@@ -172,8 +186,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 successors_scores = np.asarray(successors_scores)
                 minid = successors_scores.argmin()
                 linkDict.update({gameState:legalActions[minid]})
-                return min(successors_scores)    
-    
+                return min(successors_scores)
+
         linkDict = {}
         minimax(gameState, 0, linkDict)
         path = []
@@ -184,7 +198,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 if agentIndex==0: path.append(linkDict[cState])
                 cState = cState.generateSuccessor(agentIndex, linkDict[cState])
         return path[0]
-        util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -195,9 +208,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
-        
-        "[Project 3] YOUR CODE HERE"        
-        
+
+        "[Project 3] YOUR CODE HERE"
+
         util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
@@ -222,11 +235,10 @@ def betterEvaluationFunction(currentGameState):
 
       DESCRIPTION: <write something here so we know what you did>
     """
-    
-    "[Project 3] YOUR CODE HERE"    
-    
+
+    "[Project 3] YOUR CODE HERE"
+
     util.raiseNotDefined()
 
 # Abbreviation
 better = betterEvaluationFunction
-
