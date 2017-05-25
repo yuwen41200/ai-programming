@@ -11,6 +11,8 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+from util import manhattanDistance
+from game import Directions
 import random, util
 import numpy as np
 
@@ -69,18 +71,19 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-        distance = util.manhattanDistance(newPos, newGhostStates[0].getPosition())
+        distance = manhattanDistance(newPos, newGhostStates[0].getPosition())
 
         "[Project 3] YOUR CODE HERE"
 
-        print "successorGameState\n", successorGameState
-        print "newPos", newPos
-        print "newFood\n", newFood
-        print "newLen", newFood.width, newFood.height
-        print "newGhostPosition", newGhostStates[0].getPosition()
-        print "newScaredTimes", newScaredTimes
-        print "distance", distance
-        print ""
+        # print "action", action
+        # print "successorGameState\n", successorGameState
+        # print "newPos", newPos
+        # print "newFood\n", newFood
+        # print "newLen", newFood.width, newFood.height
+        # print "newGhostPosition", newGhostStates[0].getPosition()
+        # print "newScaredTimes", newScaredTimes
+        # print "distance", distance
+        # print ""
 
         def circleFoodScore(newPos, newFood):
             """
@@ -102,6 +105,8 @@ class ReflexAgent(Agent):
             return -2147483646
         elif successorGameState.getScore() - currentGameState.getScore() > 0:
             return successorGameState.getScore()
+        elif action == Directions.STOP:
+            return -2147483645
         else:
             score = 0
             for i in range(newFood.width):
