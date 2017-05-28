@@ -14,7 +14,7 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
-import numpy as np
+# import numpy as np
 
 from game import Agent
 
@@ -159,6 +159,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         "[Project 3] YOUR CODE HERE"
 
+        def argmax(values):
+            return max(enumerate(values), key=lambda x: x[1])[0]
+
+        def argmin(values):
+            return min(enumerate(values), key=lambda x: x[1])[0]
+
         def minimax(gameState, cdepth, linkDict):
             agentIndex = cdepth%gameState.getNumAgents()
             legalActions = gameState.getLegalActions(agentIndex)
@@ -168,16 +174,20 @@ class MinimaxAgent(MultiAgentSearchAgent):
             elif agentIndex==0:
                 successors = [gameState.generateSuccessor(agentIndex, action) for action in legalActions]
                 successors_scores = [minimax(successor, cdepth+1, linkDict) for successor in successors]
-                successors_scores = np.asarray(successors_scores)
-                maxid = successors_scores.argmax()
+                maxid = argmax(successors_scores)
+                # _successors_scores = np.asarray(successors_scores)
+                # assert maxid == _successors_scores.argmax()
                 linkDict.update({gameState:legalActions[maxid]})
+                # assert max(successors_scores) == max(_successors_scores)
                 return max(successors_scores)
             else:
                 successors = [gameState.generateSuccessor(agentIndex, action) for action in legalActions]
                 successors_scores = [minimax(successor, cdepth+1, linkDict) for successor in successors]
-                successors_scores = np.asarray(successors_scores)
-                minid = successors_scores.argmin()
+                minid = argmin(successors_scores)
+                # _successors_scores = np.asarray(successors_scores)
+                # assert minid == _successors_scores.argmin()
                 linkDict.update({gameState:legalActions[minid]})
+                # assert min(successors_scores) == min(_successors_scores)
                 return min(successors_scores)
 
         linkDict = {}
