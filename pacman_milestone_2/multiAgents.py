@@ -202,7 +202,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
 
         "[Project 3] YOUR CODE HERE"
-        
+
         def alphabetapruning(gameState, cdepth, linkDict, alpha, beta):
             agentIndex = cdepth%gameState.getNumAgents()
             legalActions = gameState.getLegalActions(agentIndex)
@@ -239,7 +239,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                     beta = min(beta,v)
                 linkDict.update({gameState:bestAction})
                 return v
-            
+
         alpha = -float("inf")
         beta = float("inf")
         linkDict = {}
@@ -252,8 +252,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 if agentIndex==0: path.append(linkDict[cState])
                 cState = cState.generateSuccessor(agentIndex, linkDict[cState])
         return path[0]
-        
-        util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -278,7 +276,7 @@ def betterEvaluationFunction(currentGameState):
 
     "[Project 3] YOUR CODE HERE"
 
-    util.raiseNotDefined()
+    return currentGameState.getScore()
 
 # Abbreviation
 better = betterEvaluationFunction
