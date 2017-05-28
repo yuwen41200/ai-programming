@@ -271,12 +271,27 @@ def betterEvaluationFunction(currentGameState):
     """
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION: Consider distance to ghosts. The farther the better.
     """
 
     "[Project 3] YOUR CODE HERE"
 
-    return currentGameState.getScore()
+    score = currentGameState.getScore()
+    pos = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    ghostStates = currentGameState.getGhostStates()
+
+    for ghostState in ghostStates:
+        score += manhattanDistance(pos, ghostState.getPosition())
+
+    # for i in range(food.width):
+        # for j in range(food.height):
+            # if food[i][j]:
+                # score -= abs(pos[0] - i) + abs(pos[1] - j)
+            # else:
+                # score -= 32
+
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
