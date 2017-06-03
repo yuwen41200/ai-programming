@@ -44,6 +44,12 @@ def createTeam(indexes, num, isRed, names=['ReflexAgent0', 'ReflexAgent1']):
 class ReflexAgent(CaptureAgent):
 
     no = -1
+    history = [
+        Directions.STOP,
+        Directions.STOP,
+        Directions.STOP,
+        Directions.STOP
+    ]
 
     def registerInitialState(self, gameState):
 
@@ -57,7 +63,19 @@ class ReflexAgent(CaptureAgent):
         maxValue = max(values)
         bestActions = [action for action, value in zip(actions, values) if value == maxValue]
 
-        return choice(bestActions)
+        chosenAction = choice(bestActions)
+        self.history.append(chosenAction)
+        if (
+            self.history[-1] == self.history[-3] and
+            self.history[-2] == self.history[-4] and
+            self.history[-1] == Directions.REVERSE[self.history[-2]]
+        ):
+            newActions = [action for action in actions if action != chosenAction]
+            chosenAction = choice(newActions)
+            self.history[-1] = chosenAction
+
+        self.history = self.history[-4:]
+        return self.history[-1]
 
     def evaluate(self, gameState, action):
 
@@ -67,16 +85,24 @@ class ReflexAgent(CaptureAgent):
         capsules = self.getCapsules(successor)
         gpos1 = successor.getAgentState(5).getPosition()
         gpos2 = successor.getAgentState(7).getPosition()
+        dis1 = self.distancer.getDistance(pos, gpos1)
+        dis2 = self.distancer.getDistance(pos, gpos2)
 
         score = successor.getScore()
         for food in foods:
             score -= self.distancer.getDistance(pos, food)
         for capsule in capsules:
             score -= 10 * self.distancer.getDistance(pos, capsule)
-        score += self.distancer.getDistance(pos, gpos1)
-        score += self.distancer.getDistance(pos, gpos2)
+        score += dis1
+        score += dis2
         if action == Directions.STOP:
             score -= 10000
+        if (pos[0]+1, pos[1]) in foods or (pos[0]-1, pos[1]) in foods:
+            score += 100
+        if (pos[0], pos[1]+1) in foods or (pos[0], pos[1]-1) in foods:
+            score += 100
+        if dis1 <= 1 or dis2 <= 1:
+            score -= 100000
 
         print self.no, action, pos, score
         return score
@@ -89,16 +115,26 @@ class ReflexAgent1(ReflexAgent):
 
     no = 1
 
+    def chooseAction(self, gameState):
+
+        actions = gameState.getLegalActions(self.index[1])
+
+        values = [self.evaluate(gameState, action) for action in actions]
+        maxValue = max(values)
+        bestActions = [action for action, value in zip(actions, values) if value == maxValue]
+
+        return choice(bestActions)
+
     def evaluate(self, gameState, action):
 
         successor = gameState.generateSuccessor(self.index[1], action)
         pos = successor.getAgentState(self.index[1]).getPosition()
         ppos1 = successor.getAgentState(1).getPosition()
+        ppos2 = successor.getAgentState(3).getPosition()
 
+        dis = min(self.distancer.getDistance(pos, ppos1), self.distancer.getDistance(pos, ppos2))
         score = successor.getScore()
-        score -= self.distancer.getDistance(pos, ppos1)
-        if action == Directions.STOP:
-            score -= 10000
+        score -= dis
 
         print self.no, action, pos, score
         return score
