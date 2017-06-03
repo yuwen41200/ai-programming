@@ -11,17 +11,15 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
 from captureAgents import CaptureAgent
-import random, time, util
 from game import Directions
-import game
+from random import choice
 
 #################
 # Team creation #
 #################
 
-def createTeam(indexes, num, isRed, names=['DummyAgent','DummyAgent']):
+def createTeam(indexes, num, isRed, names=['ReflexAgent0', 'ReflexAgent1']):
     """
     This function should return a list of agents that will form the
     team, initialized using firstIndex and secondIndex as their agent
@@ -43,60 +41,50 @@ def createTeam(indexes, num, isRed, names=['DummyAgent','DummyAgent']):
 # Agents #
 ##########
 
-class DummyAgent(CaptureAgent):
-    """
-    A Dummy agent to serve as an example of the necessary agent structure.
-    You should look at baselineTeam.py for more details about how to
-    create an agent as this is the bare minimum.
-    """
+class ReflexAgent(CaptureAgent):
+
+    no = -1
 
     def registerInitialState(self, gameState):
-        """
-        This method handles the initial setup of the
-        agent to populate useful fields (such as what team
-        we're on).
 
-        A distanceCalculator instance caches the maze distances
-        between each pair of positions, so your agents can use:
-        self.distancer.getDistance(p1, p2)
-
-        IMPORTANT: This method may run for at most 15 seconds.
-        """
-        
-        
-        """
-    	you can have your own distanceCalculator. (you can even have multiple distanceCalculators, if you need.)
-    	reference the registerInitialState function in captureAgents.py and baselineTeam.py to understand more about the distanceCalculator. 
-    	"""
-
-        """
-        Each agent has two indexes, one for pacman and the other for ghost.
-        self.index[0]: pacman
-        self.index[1]: ghost
-        """
-
-        '''
-        Make sure you do not delete the following line. If you would like to
-        use Manhattan distances instead of maze distances in order to save
-        on initialization time, please take a look at
-        CaptureAgent.registerInitialState in captureAgents.py.
-        '''
         CaptureAgent.registerInitialState(self, gameState)
 
-        '''
-        Your initialization code goes here, if you need any.
-        '''
-
-
     def chooseAction(self, gameState):
-        """
-        Picks among actions randomly.
-        """
+
         actions = gameState.getLegalActions(self.index[0])
 
-        '''
-        You should change this in your own agent.
-        '''
+        values = [self.evaluate(gameState, action) for action in actions]
+        maxValue = max(values)
+        bestActions = [action for action, value in zip(actions, values) if value == maxValue]
 
-        return random.choice(actions)
+        return choice(bestActions)
 
+    def evaluate(self, gameState, action):
+
+        successor = gameState.generateSuccessor(self.index[0], action)
+        pos = successor.getAgentState(self.index[0]).getPosition()
+        foods = self.getFood(successor).asListNot()
+        capsules = self.getCapsules(successor)
+        gpos1 = successor.getAgentState(5).getPosition()
+        gpos2 = successor.getAgentState(7).getPosition()
+
+        score = successor.getScore()
+        for food in foods:
+            score -= self.distancer.getDistance(pos, food)
+        for capsule in capsules:
+            score -= 10 * self.distancer.getDistance(pos, capsule)
+        score += self.distancer.getDistance(pos, gpos1)
+        score += self.distancer.getDistance(pos, gpos2)
+        if action == Directions.STOP:
+            score -= 10000
+
+        print self.no, action, pos, score
+        return score
+
+class ReflexAgent0(ReflexAgent):
+
+    no = 0
+
+class ReflexAgent1(ReflexAgent):
+
+    no = 1
