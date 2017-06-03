@@ -88,3 +88,17 @@ class ReflexAgent0(ReflexAgent):
 class ReflexAgent1(ReflexAgent):
 
     no = 1
+
+    def evaluate(self, gameState, action):
+
+        successor = gameState.generateSuccessor(self.index[1], action)
+        pos = successor.getAgentState(self.index[1]).getPosition()
+        ppos1 = successor.getAgentState(1).getPosition()
+
+        score = successor.getScore()
+        score -= self.distancer.getDistance(pos, ppos1)
+        if action == Directions.STOP:
+            score -= 10000
+
+        print self.no, action, pos, score
+        return score
