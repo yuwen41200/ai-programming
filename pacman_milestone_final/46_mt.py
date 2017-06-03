@@ -121,7 +121,7 @@ class ReflexAgent(CaptureAgent):
         if dis1 <= 1 or dis2 <= 1:
             score -= 100000
 
-        print self.no, action, pos, score
+        # print self.no, action, pos, score
         return score
 
 class ReflexAgent0(ReflexAgent):
@@ -168,5 +168,5 @@ class ReflexAgent1(ReflexAgent):
             score = -score
         score -= dis
 
-        print self.no, action, pos, score
+        # print self.no, action, pos, score
         return score
